@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Ultrasound Analysis System</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+
+</head>
+
+<body>
+    <div class="medical-header">
+        <h1>AI-Powered Ultrasound Analysis System</h1>
+        <p class="m-0">Advanced Medical Imaging Analysis &amp; Report Generation</p>
+    </div>
+
+    <div class="container" style="max-width: 1200px; margin-top: var(--space-24);">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('upload')">Image Upload & Analysis</button>
+            <button class="nav-tab" onclick="switchTab('report')">Generated Report</button>
+        </div>
+
+        <div id="upload-tab" class="tab-content active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Ultrasound Image Upload</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="upload-zone" onclick="document.getElementById('imageInput').click()">
+                            <input type="file" id="imageInput" accept="image/*" style="display: none;"
+                                onchange="handleImageUpload(event)">
+                            <div id="uploadContent">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <p class="mt-8"><strong>Click to upload</strong> or drag ultrasound image here</p>
+                                <p class="m-0"
+                                    style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">Supports
+                                    JPEG, PNG (DICOM simulation)</p>
+                            </div>
+                        </div>
+
+                        <div id="imagePreview" style="display: none;">
+                            <img id="previewImg" class="image-preview" alt="Uploaded ultrasound">
+                            <div style="margin-top: var(--space-12); text-align: center;">
+                                <button class="btn btn--secondary btn--sm" onclick="clearImage()">Remove Image</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Patient &amp; Study Information</h3>
+                    </div>
+                    <div class="card__body">
+                        <form id="patientForm">
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="form-label">Patient Name</label>
+                                    <input type="text" class="form-control" id="patientName"
+                                        placeholder="Enter patient name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="patientAge" placeholder="Age">
+                                </div>
+                            </div>
+
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="form-label">Gender</label>
+                                    <select class="form-control" id="patientGender">
+                                        <option value="">Select gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Study Date</label>
+                                    <input type="date" class="form-control" id="studyDate">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Clinical Indication</label>
+                                <textarea class="form-control" id="clinicalIndication" rows="2"
+                                    placeholder="Reason for examination"></textarea>
+                            </div>
+
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="form-label">Examination Type</label>
+                                    <select class="form-control" id="examType">
+                                        <option value="">Select type</option>
+                                        <option value="Abdominal">Abdominal</option>
+                                        <option value="Obstetric">Obstetric</option>
+                                        <option value="Cardiac">Cardiac</option>
+                                        <option value="Vascular">Vascular</option>
+                                        <option value="Musculoskeletal">Musculoskeletal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Probe Frequency</label>
+                                    <select class="form-control" id="probeFreq">
+                                        <option value="">Select frequency</option>
+                                        <option value="2-5 MHz">2-5 MHz (Low frequency)</option>
+                                        <option value="5-10 MHz">5-10 MHz (Medium frequency)</option>
+                                        <option value="10-15 MHz">10-15 MHz (High frequency)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: var(--space-24) 0;">
+                <button class="btn btn--primary btn--lg" onclick="startAnalysis()" id="analyzeBtn" disabled>
+                    🔬 Start AI Analysis
+                </button>
+            </div>
+
+            <div id="analysisProgress" style="display: none;">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>AI Analysis in Progress</h3>
+                    </div>
+                    <div class="card__body">
+                        <div id="loadingState" style="text-align: center; padding: var(--space-32);">
+                            <div class="spinner"></div>
+                            <p class="mt-4">Analyzing ultrasound image...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-tab" class="tab-content">
+            <div class="card">
+                <div class="card__header flex justify-between items-center">
+                    <h3>Ultrasound Analysis Report</h3>
+                    <div>
+                        <button class="btn btn--secondary btn--sm" onclick="editReport()">✏️ Edit</button>
+                        <button class="btn btn--outline btn--sm" onclick="exportReport()">📄 Export PDF</button>
+                    </div>
+                </div>
+                <div class="card__body" id="reportContent">
+                    <div class="report-placeholder"
+                        style="text-align: center; padding: var(--space-32); color: var(--color-text-secondary);">
+                        <p>📋 No analysis completed yet</p>
+                        <p>Upload an image and complete analysis to generate report</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <button class="btn btn--primary print-btn" onclick="window.print()" style="display: none;" id="printBtn">
+        🖨️ Print Report
+    </button>
+
+
+</body>
+
+</html>
